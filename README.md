@@ -12,4 +12,4 @@
 **Use train_data and train_label to training, and use test_data and test_label to compute the accuracy.**
 
 ### Output
-** Output the cost time and accuracy in different datasize with different activation function.**
+**Output the cost time and accuracy in different datasize with different activation function.**
