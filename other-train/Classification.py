@@ -13,6 +13,7 @@ def add_layer(inputs, in_size, out_size, activation_function=None,):
     else:
         outputs = activation_function(Wx_plus_b,)
     return outputs
+
 def compute_accuracy(v_xs, v_ys):
     global prediction
     y_pre = sess.run(prediction, feed_dict={xs: v_xs})
