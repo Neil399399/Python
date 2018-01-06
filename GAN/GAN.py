@@ -120,7 +120,7 @@ def show_train_hist(hist, show = False, save = False, path = 'Train_hist.png'):
 
 # training parameters
 batch_size = 100
-lr = 0.0002
+lr = 0.05
 train_epoch = 1000
 
 # load MNIST
