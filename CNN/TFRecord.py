@@ -78,7 +78,7 @@ def TFRecord_Writer(images, labels, images_dir, TFrecord_name):
 
 def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Size):
     # create queue.
-    filename_queue = tf.train.string_input_producer([TFRecord_File],shuffle=False,num_epochs=1)
+    filename_queue = tf.train.string_input_producer([TFRecord_File],shuffle=True,num_epochs=None)
     # reader.
     reader = tf.TFRecordReader()
     key, serialized_example = reader.read(filename_queue)
@@ -93,13 +93,17 @@ def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Siz
     image_content = tf.decode_raw(img_features['image_raw'], tf.uint8)
     image_float32 = tf.image.convert_image_dtype(image_content,tf.float32)
     image = tf.reshape(image_float32, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
-    label = tf.cast(img_features['Label'], tf.float32)
+    label_temp = tf.cast(img_features['Label'], tf.float32)   # [0, 0, 0,]
+    label = tf.reshape(label_temp, [1])                       # [ [0],
+                                                              #   [0],]
+
+
     # regulate images size.
     resized_image = tf.image.resize_image_with_crop_or_pad(image=image,target_height=IMAGE_HEIGHT,target_width=IMAGE_WIDTH)
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
-                            capacity=30,
+                            capacity=1000,
                             num_threads=1,
-                            min_after_dequeue=10)
+                            min_after_dequeue=1)
     return images, labels
