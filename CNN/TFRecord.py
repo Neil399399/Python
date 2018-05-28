@@ -48,30 +48,30 @@ def get_File(file_dir):
   label_list = [int(float(i)) for i in label_list]
   return image_list, label_list
 
-def TFRecord_Writer(images, labels, images_dir, TFrecord_name):
+def TFRecord_Writer(images, labels, images_dir,image_folder , TFrecord_name):
   n_samples = len(labels)
   TFWriter = tf.python_io.TFRecordWriter(TFrecord_name)
-
   print('Start make TFRecord ...')
-  for i in np.arange(0, n_samples):
-    try:
-      image = io.imread(images_dir+images[i])
-
-      if image is None:
-        print('Error image:' + images[i])
-      else:
-        image_raw = image.tostring()
-      label = int(labels[i])
-      height, width, depth = image.shape
-      # 將 tf.train.Feature 合併成 tf.train.Features
-      ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
-                                'height':int64_feature(height),'width': int64_feature(width)})
-      # 將 tf.train.Features 轉成 tf.train.Example
-      example = tf.train.Example(features=ftrs)
-      # 將 tf.train.Example 寫成 tfRecord 格式
-      TFWriter.write(example.SerializeToString())
-    except:
-      print('Skip!')
+  for each_image_folder in image_folder:
+    for i in np.arange(0, n_samples):
+      try:
+        image = io.imread(images_dir+each_image_folder+'/'+images[i])
+        if image is None:
+          print('Error image:' + images[i])
+        else:
+          image_raw = image.tostring()
+        label = int(labels[i])
+        
+        height, width, depth = image.shape
+        # 將 tf.train.Feature 合併成 tf.train.Features
+        ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
+                                  'height':int64_feature(height),'width': int64_feature(width)})
+        # 將 tf.train.Features 轉成 tf.train.Example
+        example = tf.train.Example(features=ftrs)
+        # 將 tf.train.Example 寫成 tfRecord 格式
+        TFWriter.write(example.SerializeToString())
+      except:
+        print('Image is not in this folder!')
 
   TFWriter.close()
   print('make TFRecord done!')
@@ -93,11 +93,8 @@ def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Siz
     image_content = tf.decode_raw(img_features['image_raw'], tf.uint8)
     image_float32 = tf.image.convert_image_dtype(image_content,tf.float32)
     image = tf.reshape(image_float32, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
-    label_temp = tf.cast(img_features['Label'], tf.float32)   # [0, 0, 0,]
-    label = tf.reshape(label_temp, [1])                       # [ [0],
+    label = tf.cast(img_features['Label'], tf.float32)   # [0, 0, 0,]
                                                               #   [0],]
-
-
     # regulate images size.
     resized_image = tf.image.resize_image_with_crop_or_pad(image=image,target_height=IMAGE_HEIGHT,target_width=IMAGE_WIDTH)
     images, labels = tf.train.shuffle_batch(

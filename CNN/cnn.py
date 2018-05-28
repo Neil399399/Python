@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Pool_Size, Padding, Activation_Function):
+def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Pool_Size, Padding, Activation_Function, output_layer_units):
     # CNN.
     output_shape = (Image_height/Pool_Size**2)*(Image_width/Pool_Size**2)*Conv2_Filter
     # (image_height, image_width, Conv1_Filter)
@@ -10,6 +10,7 @@ def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Pool
     conv2 = tf.layers.conv2d(pool1, Conv2_Filter, 5, 1, Padding, activation=Activation_Function)    
     pool2 = tf.layers.max_pooling2d(conv2, Pool_Size, 2)
 
-    flat = tf.reshape(pool2, [-1, 160*160*36])
-    output = tf.layers.dense(flat, 1)
-    return flat, output
+    flat = tf.reshape(pool2, [-1, int(output_shape)])
+    # output layer
+    output = tf.layers.dense(flat, output_layer_units)
+    return output
