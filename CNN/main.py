@@ -23,7 +23,7 @@ if __name__ =='__main__':
     test_images,test_labels = TFRecord_Reader('test3.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,4)
 
     # setting placeholder.
-    tf_x = tf.placeholder(tf.float32, [None, 640,640,3])
+    tf_x = tf.placeholder(tf.float32, [None, 640,640,3])/255
     image = tf.reshape(tf_x, [-1, 640, 640, 3])              # (batch, height, width, channel)
     tf_y = tf.placeholder(tf.float32, [None,2]) 
     output = CNN_Model(image,640,640,6,36,2,'same',tf.nn.relu,2)
