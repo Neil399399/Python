@@ -14,13 +14,13 @@ LR = 0.001
 
 if __name__ =='__main__':
     # # make image to .TFRecord file.
-    image_list,label_list = get_File(image_Dir)
-    TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
+    # image_list,label_list = get_File(image_Dir)
+    # TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
 
     # train data.
-    train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,4)
+    train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
     # test data.
-    test_images,test_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,4)
+    test_images,test_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, 640,640,3])/255
@@ -54,9 +54,9 @@ if __name__ =='__main__':
     
     # training.
     print('Start training ... ')
-    for step in range(2):
+    for step in range(500):
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
-        if step % 1 == 0:
+        if step % 50 == 0:
             validate_accuracy = sess.run(accuracy, {tf_x: train_feature, tf_y: train_label_onehot})
             print('After %d training step(s), the validation accuracy is %.2f.'%(step,validate_accuracy))
             print('loss : ',loss_)
