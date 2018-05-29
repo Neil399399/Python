@@ -25,8 +25,8 @@ if __name__ =='__main__':
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, 640,640,3])/255
     image = tf.reshape(tf_x, [-1, 640, 640, 3])              # (batch, height, width, channel)
-    tf_y = tf.placeholder(tf.float32, [None,2]) 
-    output = CNN_Model(image,640,640,6,36,2,'same',tf.nn.relu,2)
+    tf_y = tf.placeholder(tf.float32, [None,one_hot_depth]) 
+    output = CNN_Model(image,640,640,6,36,2,'same',tf.nn.relu,one_hot_depth)
 
     # def.
     loss = tf.losses.softmax_cross_entropy(onehot_labels=tf_y, logits=output)
