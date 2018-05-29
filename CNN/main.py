@@ -19,8 +19,6 @@ if __name__ =='__main__':
 
     # train data.
     train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
-    # test data.
-    test_images,test_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, 640,640,3])/255
@@ -43,12 +41,12 @@ if __name__ =='__main__':
     sess.run(init_op)
 
     # set train dict.
-    train_feature, train_label = sess.run([train_images,train_labels])
+    train_feature, train_label = sess.run([train_images[:1000],train_labels[:1000]])
     # decode train_label to one_hot.
     train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
     # set test dict.
-    test_feature, test_label = sess.run([test_images,test_labels])
+    test_feature, test_label = sess.run([train_images[1000:],train_labels[1000:]])
     # decode test_label to one_hot.
     test_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
     

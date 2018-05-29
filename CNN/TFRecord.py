@@ -36,6 +36,7 @@ def get_File(file_dir):
   count = 0
   for a_folder in subfolders:
       n_img = len(os.listdir(a_folder))
+      print('label - folder : ',fileNames,count)
       labels = np.append(labels, n_img * [count])
       count+=1
 
@@ -71,7 +72,7 @@ def TFRecord_Writer(images, labels, images_dir,image_folder , TFrecord_name):
         # 將 tf.train.Example 寫成 tfRecord 格式
         TFWriter.write(example.SerializeToString())
       except:
-        print('Image is not in this folder!')
+        continue
 
   TFWriter.close()
   print('make TFRecord done!')
