@@ -36,7 +36,7 @@ def get_File(file_dir):
   count = 0
   for a_folder in subfolders:
       n_img = len(os.listdir(a_folder))
-      print('label - folder : ',fileNames,count)
+      print('label - folder : ',a_folder,count)
       labels = np.append(labels, n_img * [count])
       count+=1
 
