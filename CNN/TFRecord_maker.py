@@ -1,4 +1,4 @@
-from TFRecord import get_File,TFRecord_Writer
+from TFRecord import get_File,TFRecord_Writer,TFRecord_Reader
 from cnn import CNN_Model
 import tensorflow as tf
 import numpy as np  
@@ -11,7 +11,7 @@ if __name__ =='__main__':
    # make image to .TFRecord file.
     image_list,label_list = get_File(image_Dir)
     TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
-    train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
+    train_images,train_labels = TFRecord_Reader('test.tfrecords',640,640,3,100)
 
     # turn on tensorflow.
     sess = tf.Session()
