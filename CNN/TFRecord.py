@@ -49,7 +49,7 @@ def get_File(file_dir):
   label_list = [int(float(i)) for i in label_list]
   return image_list, label_list
 
-def TFRecord_Writer(images, labels, images_dir,image_folder , TFrecord_name):
+def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
   n_samples = len(labels)
   TFWriter = tf.python_io.TFRecordWriter(TFrecord_name)
   print('Start make TFRecord ...')
@@ -61,8 +61,8 @@ def TFRecord_Writer(images, labels, images_dir,image_folder , TFrecord_name):
           print('Error image:' + images[i])
         else:
           image_raw = image.tostring()
+
         label = int(labels[i])
-        
         height, width, depth = image.shape
         # 將 tf.train.Feature 合併成 tf.train.Features
         ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
@@ -103,5 +103,5 @@ def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Siz
                             batch_size= Batch_Size,
                             capacity=1000,
                             num_threads=5,
-                            min_after_dequeue=100)
+                            min_after_dequeue=2)
     return images, labels

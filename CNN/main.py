@@ -3,8 +3,6 @@ from cnn import CNN_Model
 import tensorflow as tf
 import numpy as np
 # global value.
-image_Dir = './example_data/'
-image_folder_list = ['台灣','美食','捷運','早餐']
 IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
@@ -13,10 +11,6 @@ LR = 0.001
 
 
 if __name__ =='__main__':
-    # # make image to .TFRecord file.
-    image_list,label_list = get_File(image_Dir)
-    TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
-
     # train data.
     train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
 
