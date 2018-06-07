@@ -64,6 +64,9 @@ def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
 
         label = int(labels[i])
         height, width, depth = image.shape
+        # check the image shape.
+        if height != 640 or width !=640:
+              continue
         # 將 tf.train.Feature 合併成 tf.train.Features
         ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
                                   'height':int64_feature(height),'width': int64_feature(width)})
@@ -79,10 +82,10 @@ def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
 
 def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Size):
     # create queue.
-    filename_queue = tf.train.string_input_producer([TFRecord_File],shuffle=True,num_epochs=None)
+    filename_queue = tf.train.string_input_producer([TFRecord_File],num_epochs=None)
     # reader.
     reader = tf.TFRecordReader()
-    key, serialized_example = reader.read(filename_queue)
+    _, serialized_example = reader.read(filename_queue)
     # get features.
     img_features = tf.parse_single_example(serialized_example,features={
                                     'Label'    : tf.FixedLenFeature([], tf.int64),
@@ -92,16 +95,15 @@ def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Siz
     
     # recover image. 
     image_content = tf.decode_raw(img_features['image_raw'], tf.uint8)
-    image_float32 = tf.image.convert_image_dtype(image_content,tf.float32)
-    image = tf.reshape(image_float32, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
-    label = tf.cast(img_features['Label'], tf.float32)   # [0, 0, 0,]
-                                                              #   [0],]
+    # image_float32 = tf.image.convert_image_dtype(image_content,tf.float32)
+    image = tf.reshape(image_content, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
+    img = tf.cast(image, tf.float32) * (1. / 255) - 0.5
+    label = tf.cast(img_features['Label'], tf.float32)   
     # regulate images size.
-    resized_image = tf.image.resize_image_with_crop_or_pad(image=image,target_height=IMAGE_HEIGHT,target_width=IMAGE_WIDTH)
+    resized_image = tf.image.resize_image_with_crop_or_pad(image=img,target_height=IMAGE_HEIGHT,target_width=IMAGE_WIDTH)
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
-                            capacity=1000,
-                            num_threads=5,
-                            min_after_dequeue=2)
+                            capacity=10000+3*Batch_Size,
+                            min_after_dequeue=1000)
     return images, labels

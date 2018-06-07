@@ -9,9 +9,9 @@ image_folder_list = ['台灣','美食','捷運','早餐']
   
 if __name__ =='__main__':
    # make image to .TFRecord file.
-    image_list,label_list = get_File(image_Dir)
-    TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
-    train_images,train_labels = TFRecord_Reader('test.tfrecords',640,640,3,100)
+    # image_list,label_list = get_File(image_Dir)
+    # TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
+    train_images,train_labels = TFRecord_Reader('test.tfrecords',640,640,3,10)
 
     # turn on tensorflow.
     sess = tf.Session()
@@ -23,5 +23,8 @@ if __name__ =='__main__':
     sess.run(init_op)
 
     # set train dict.
-    train_feature, train_label = sess.run([train_images[:1000],train_labels[:1000]])
-    print(train_label)
+    for i in range(5):
+        train_feature, train_label = sess.run([train_images,train_labels])
+        print(train_feature[1])
+        print(train_label)
+

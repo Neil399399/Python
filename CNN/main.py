@@ -46,9 +46,9 @@ if __name__ =='__main__':
     
     # training.
     print('Start training ... ')
-    for step in range(500):
+    for step in range(100):
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
-        if step % 50 == 0:
+        if step % 10 == 0:
             validate_accuracy = sess.run(accuracy, {tf_x: train_feature, tf_y: train_label_onehot})
             print('After %d training step(s), the validation accuracy is %.2f.'%(step,validate_accuracy))
             print('loss : ',loss_)
