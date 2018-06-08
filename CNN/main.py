@@ -36,7 +36,7 @@ if __name__ =='__main__':
     sess.run(init_op)
 
     # set train dict.
-    train_feature, train_label = sess.run([train_images,train_labels]])
+    train_feature, train_label = sess.run([train_images,train_labels])
     # decode train_label to one_hot.
     train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
