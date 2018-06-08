@@ -51,7 +51,7 @@ if __name__ =='__main__':
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
-            TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.'step,validate_accuracy)
+            TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
             TensorFlow_log.info('loss : %.4f',loss_)
 
     # final validate with used test data.
