@@ -16,3 +16,10 @@ Ex : CNN_Model ( image,640,640,6,36,2,'same',tf.nn.relu,2 )
  
 * The `one_hot_depth` should equal output_layer units.
 * Used `np.argmax()` to validate the value that predict by model.
+
+## Note
+
+* 需要將訓練資料放在 `train` 資料夾內(不能有任何子資料夾，否則會抓不到該檔案)。
+* 需要將測試資料分類好並放在 `example_data` 內，本程式會以`example_data` 內的資料為基礎產生 file(image)_list.
+* 產出的 `.tfrecord` 檔案會放置在 `TFRecord`。
+* 完成以上步驟後請先執行 `TFRecord_maker.py`。

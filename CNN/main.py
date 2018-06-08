@@ -13,7 +13,7 @@ LR = 0.001
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('test.tfrecords',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
@@ -48,7 +48,7 @@ if __name__ =='__main__':
     # training.
     TensorFlow_log.info('Make graph and start trainng.')
     for step in range(100):
-        TensorFlow_log.info('Training step :',step)
+        TensorFlow_log.info('Training step :%d',step)
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})

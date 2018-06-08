@@ -4,15 +4,23 @@ from utilities.log import TFRecord_log
 import tensorflow as tf
 import numpy as np
 image_Dir = './example_data/'
-image_folder_list = ['台灣','美食','捷運','早餐']
-
+image_folder_list = ['台灣','早餐']
+tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1']
+# ['台灣','美食','捷運','早餐']
 
   
 if __name__ =='__main__':
    # make image to .TFRecord file.
+    i=0
     image_list,label_list = get_File(image_Dir)
-    TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
-    # train_images,train_labels = TFRecord_Reader('test.tfrecords',640,640,3,10)
+    # make train tfrecord.
+    TFRecord_Writer(image_list,label_list,'./','train','./TFRecord/train.tfrecord')
+    # make test tfrecord.
+    for each_folder in image_folder_list:
+        TFRecord_Writer(image_list,label_list,image_Dir,each_folder,'./TFRecord/test.tfrecord'+str(i))
+        i+=1
+
+    # train_images,train_labels = TFRecord_Reader(['./TFRecord/train.tfrecord'],640,640,3,5)
     # # turn on tensorflow.
     # sess = tf.Session()
     # init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
@@ -24,6 +32,7 @@ if __name__ =='__main__':
 
     # # set train dict.
     # for i in range(5):
+        
     #     train_feature, train_label = sess.run([train_images,train_labels])
     #     print(train_feature[1])
     #     print(train_label)

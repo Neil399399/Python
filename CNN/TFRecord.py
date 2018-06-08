@@ -3,6 +3,7 @@ from utilities.log import TFRecord_log
 import numpy as np
 from skimage import io
 import os 
+import random
 
 # 二進位資料
 def bytes_feature(value):
@@ -54,38 +55,38 @@ def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
   n_samples = len(labels)
   TFWriter = tf.python_io.TFRecordWriter(TFrecord_name)
   TFRecord_log.info('Start make TFRecord file.')
-  for each_image_folder in image_folder:
-    for i in np.arange(0, n_samples):
-      try:
-        image = io.imread(images_dir+each_image_folder+'/'+images[i])
-        if image is None:
-          TFRecord_log.warning('Error image:' + images[i])
-        else:
-          image_raw = image.tostring()
+  for i in np.arange(0, n_samples):
+    try:
+      image = io.imread(images_dir+image_folder+'/'+images[i])
+      if image is None:
+        TFRecord_log.warning('Error image:' + images[i])
+      else:
+        image_raw = image.tostring()
 
-        label = int(labels[i])
-        height, width, depth = image.shape
-        # check the image shape.
-        if height != 640 or width !=640:
-              continue
-        # take tf.train.Feature and merge to tf.train.Features.
-        ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
-                                  'height':int64_feature(height),'width': int64_feature(width)})
-        # take tf.train.Features and change to tf.train.Example.
-        example = tf.train.Example(features=ftrs)
-        # take tf.train.Example and write in tfRecord file.
-        TFWriter.write(example.SerializeToString())
-      except:
-        # image is not in this folder.
-        continue
+      label = int(labels[i])
+      height, width, depth = image.shape
+      # check the image shape.
+      if height != 640 or width !=640:
+            continue
+      # take tf.train.Feature and merge to tf.train.Features.
+      ftrs = tf.train.Features(feature={'Label': int64_feature(label),'image_raw': bytes_feature(image_raw),
+                                'height':int64_feature(height),'width': int64_feature(width)})
+      # take tf.train.Features and change to tf.train.Example.
+      example = tf.train.Example(features=ftrs)
+      # take tf.train.Example and write in tfRecord file.
+      TFWriter.write(example.SerializeToString())
+    except:
+      # image is not in this folder.
+      continue
+
   TFWriter.close()
   TFRecord_log.info('Make TFRecord file done.')
 
-def TFRecord_Reader(TFRecord_File,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Size):
+def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Size):
     TFRecord_log.info('Start read TFRecord file.')
     # create queue.
     try:
-      filename_queue = tf.train.string_input_producer([TFRecord_File],num_epochs=None)
+      filename_queue = tf.train.string_input_producer(TFRecord_Files,shuffle=True,num_epochs=None)
     except:
       TFRecord_log.error('Input data in queue faild !!')
     # reader.
