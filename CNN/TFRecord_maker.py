@@ -10,8 +10,8 @@ image_folder_list = ['台灣','美食','捷運','早餐']
   
 if __name__ =='__main__':
    # make image to .TFRecord file.
-    image_list,label_list = get_File(image_Dir)
-    TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
+    # image_list,label_list = get_File(image_Dir)
+    # TFRecord_Writer(image_list,label_list,image_Dir,image_folder_list,'test.tfrecords')
     # train_images,train_labels = TFRecord_Reader('test.tfrecords',640,640,3,10)
     # # turn on tensorflow.
     # sess = tf.Session()

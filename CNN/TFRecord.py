@@ -37,7 +37,7 @@ def get_File(file_dir):
   count = 0
   for a_folder in subfolders:
       n_img = len(os.listdir(a_folder))
-      TFRecord_log.info('label - folder : '+a_folder+' %d',%(count))
+      TFRecord_log.info('label - folder : %s %d',a_folder,count)
       labels = np.append(labels, n_img * [count])
       count+=1
 
