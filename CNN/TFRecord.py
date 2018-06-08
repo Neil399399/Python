@@ -1,9 +1,9 @@
-import tensorflow as tf
 from utilities.log import TFRecord_log
-import numpy as np
 from skimage import io
+from shutil import copy
+import tensorflow as tf
+import numpy as np
 import os 
-import random
 
 # 二進位資料
 def bytes_feature(value):
@@ -22,7 +22,6 @@ def get_File(file_dir):
   images = []
   # The subfolders
   subfolders = []
-
   # Using "os.walk" function to grab all the files in each folder
   for dirPath, dirNames, fileNames in os.walk(file_dir):
     for name in dirNames:
@@ -32,7 +31,9 @@ def get_File(file_dir):
     for dirPath, dirNames, fileNames in os.walk(folder):
       for image_name in fileNames:
         images.append(image_name)
-
+        # copy file to make training data.
+        copy(os.path.join(dirPath, image_name),'./train/')
+  
   # To record the labels of the image dataset. ex: [0,0,1,1,2,2,2]
   labels = []
   count = 0

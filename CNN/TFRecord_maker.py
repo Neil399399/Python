@@ -3,6 +3,10 @@ from cnn import CNN_Model
 from utilities.log import TFRecord_log
 import tensorflow as tf
 import numpy as np
+import os
+import shutil
+
+# global value.
 image_Dir = './example_data/'
 image_folder_list = ['台灣','早餐']
 tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1']
@@ -12,9 +16,13 @@ tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1']
 if __name__ =='__main__':
    # make image to .TFRecord file.
     i=0
+    if not os.path.exists('./train'):
+        os.makedirs('./train')
     image_list,label_list = get_File(image_Dir)
     # make train tfrecord.
     TFRecord_Writer(image_list,label_list,'./','train','./TFRecord/train.tfrecord')
+    shutil.rmtree('./train', ignore_errors=True)
+    TFRecord_log.info('Remove train folder.')
     # make test tfrecord.
     for each_folder in image_folder_list:
         TFRecord_Writer(image_list,label_list,image_Dir,each_folder,'./TFRecord/test.tfrecord'+str(i))
