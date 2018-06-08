@@ -48,6 +48,7 @@ if __name__ =='__main__':
     # training.
     TensorFlow_log.info('Make graph and start trainng.')
     for step in range(100):
+        TensorFlow_log.info('Training step :',step)
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
