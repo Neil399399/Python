@@ -51,17 +51,17 @@ if __name__ =='__main__':
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot})
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
-            TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.'%(step,validate_accuracy))
-            TensorFlow_log.info('loss : %.4f',%(loss_))
+            TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.'step,validate_accuracy)
+            TensorFlow_log.info('loss : %.4f',loss_)
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing.')
     test_accuracy = sess.run(accuracy,{tf_x: test_feature, tf_y: test_label_onehot})
-    TensorFlow_log.info('Final accuracy : %.2f',%(test_accuracy))
+    TensorFlow_log.info('Final accuracy : %.2f',test_accuracy)
     test_output = sess.run(output, {tf_x: test_feature[:2]})
     pred_y = np.argmax(test_output, 1)
-    TensorFlow_log.info('Prediction label : %d',%(pred_y))
-    TensorFlow_log.info('Real label : %d',%(test_label[:2]))
+    TensorFlow_log.info('Prediction label : %d',pred_y)
+    TensorFlow_log.info('Real label : %d',test_label[:2])
     # stop all threads
     coord.request_stop()
     coord.join(threads)
