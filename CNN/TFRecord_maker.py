@@ -8,8 +8,8 @@ import shutil
 
 # global value.
 image_Dir = './example_data/'
-image_folder_list = ['台灣','早餐']
-tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1']
+image_folder_list = ['台灣','早餐','美食','捷運']
+tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1','./TFRecord/test.tfrecord2','./TFRecord/test.tfrecord3']
 # ['台灣','美食','捷運','早餐']
 
   
