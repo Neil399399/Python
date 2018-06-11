@@ -7,13 +7,13 @@ import numpy as np
 IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
-one_hot_depth = 2
+one_hot_depth = 4
 LR = 0.001
 
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
@@ -53,7 +53,7 @@ if __name__ =='__main__':
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
-            TensorFlow_log.info('loss : %.4f',loss_)
+            TensorFlow_log.info('loss : %f',loss_)
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing.')
@@ -61,8 +61,8 @@ if __name__ =='__main__':
     TensorFlow_log.info('Final accuracy : %.2f',test_accuracy)
     test_output = sess.run(output, {tf_x: test_feature[:2]})
     pred_y = np.argmax(test_output, 1)
-    TensorFlow_log.info('Prediction label : %d',pred_y)
-    TensorFlow_log.info('Real label : %d',test_label[:2])
+    TensorFlow_log.info('Prediction label : %s',pred_y)
+    TensorFlow_log.info('Real label : %s',test_label[:2])
     # stop all threads
     coord.request_stop()
     coord.join(threads)
