@@ -22,10 +22,13 @@ def get_File(file_dir):
   images = []
   # The subfolders
   subfolders = []
+  # The folders.
+  folders = []
   # Using "os.walk" function to grab all the files in each folder
   for dirPath, dirNames, fileNames in os.walk(file_dir):
     for name in dirNames:
       subfolders.append(os.path.join(dirPath, name))
+      folders.append(name)
     
   for folder in subfolders:
     for dirPath, dirNames, fileNames in os.walk(folder):
@@ -50,11 +53,11 @@ def get_File(file_dir):
   image_list = list(subfolders[:, 0])
   label_list = list(subfolders[:, 1])
   label_list = [int(float(i)) for i in label_list]
-  return image_list, label_list
+  return image_list, label_list, folders
 
-def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
+def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_dir, TFrecord_name):
   n_samples = len(labels)
-  TFWriter = tf.python_io.TFRecordWriter(TFrecord_name)
+  TFWriter = tf.python_io.TFRecordWriter(TFrecord_dir+TFrecord_name)
   TFRecord_log.info('Start make TFRecord file.')
   for i in np.arange(0, n_samples):
     try:
@@ -115,6 +118,6 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
-                            capacity=20+3*Batch_Size,
-                            min_after_dequeue=10)
+                            capacity=50+3*Batch_Size,
+                            min_after_dequeue=20)
     return images, labels

@@ -8,24 +8,28 @@ import shutil
 
 # global value.
 image_Dir = './example_data/'
+tfrecord_dir = './TFRecord/'
 image_folder_list = ['台灣','早餐','美食','捷運']
-tfrecord_files_path = ['./TFRecord/test.tfrecord0','./TFRecord/test.tfrecord1','./TFRecord/test.tfrecord2','./TFRecord/test.tfrecord3']
 # ['台灣','美食','捷運','早餐']
 
   
 if __name__ =='__main__':
    # make image to .TFRecord file.
     i=0
+    # make folder if not exsit.
     if not os.path.exists('./train'):
         os.makedirs('./train')
-    image_list,label_list = get_File(image_Dir)
+    if not os.path.exists('./TFRecord'):
+        os.makedirs('./TFRecord')
+
+    image_list,label_list, folders = get_File(image_Dir)
     # make train tfrecord.
-    TFRecord_Writer(image_list,label_list,'./','train','./TFRecord/train.tfrecord')
+    TFRecord_Writer(image_list,label_list,'./','train',tfrecord_dir,'train.tfrecord')
     shutil.rmtree('./train', ignore_errors=True)
     TFRecord_log.info('Remove train folder.')
     # make test tfrecord.
-    for each_folder in image_folder_list:
-        TFRecord_Writer(image_list,label_list,image_Dir,each_folder,'./TFRecord/test.tfrecord'+str(i))
+    for each_folder in folders:
+        TFRecord_Writer(image_list,label_list,image_Dir,each_folder,tfrecord_dir,'test.tfrecord'+str(i))
         i+=1
 
     # train_images,train_labels = TFRecord_Reader(['./TFRecord/train.tfrecord'],640,640,3,5)

@@ -14,6 +14,8 @@ LR = 0.001
 if __name__ =='__main__':
     # train data.
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+    # test data.
+    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord0',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,10)
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
@@ -41,7 +43,7 @@ if __name__ =='__main__':
     train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
     # set test dict.
-    test_feature, test_label = sess.run([train_images[1000:],train_labels[1000:]])
+    test_feature, test_label = sess.run([test_images,test_labels])
     # decode test_label to one_hot.
     test_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
     
@@ -59,10 +61,10 @@ if __name__ =='__main__':
     TensorFlow_log.info('Start Testing.')
     test_accuracy = sess.run(accuracy,{tf_x: test_feature, tf_y: test_label_onehot})
     TensorFlow_log.info('Final accuracy : %.2f',test_accuracy)
-    test_output = sess.run(output, {tf_x: test_feature[:2]})
+    test_output = sess.run(output, {tf_x: test_feature[:10]})
     pred_y = np.argmax(test_output, 1)
     TensorFlow_log.info('Prediction label : %s',pred_y)
-    TensorFlow_log.info('Real label : %s',test_label[:2])
+    TensorFlow_log.info('Real label : %s',test_label[:10])
     # stop all threads
     coord.request_stop()
     coord.join(threads)
