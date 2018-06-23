@@ -15,6 +15,7 @@ if __name__ =='__main__':
     # train data.
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,30)
     test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord0',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
     image = tf.reshape(tf_x, [-1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])              # (batch, height, width, channel)
@@ -56,7 +57,7 @@ if __name__ =='__main__':
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
-            TensorFlow_log.info('loss : %s',loss_)
+            TensorFlow_log.info('loss : %s',loss)
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing.')
