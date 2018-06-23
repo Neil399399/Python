@@ -21,13 +21,15 @@ def get_File(file_dir):
   # The images in each subfolder
   images = []
   # The subfolders
-  subfolders = []
+  subfolder = []
+  folders = []
   # Using "os.walk" function to grab all the files in each folder
   for dirPath, dirNames, fileNames in os.walk(file_dir):
     for name in dirNames:
-      subfolders.append(os.path.join(dirPath, name))
+      subfolder.append(os.path.join(dirPath, name))
+      folders.append(name)
     
-  for folder in subfolders:
+  for folder in subfolder:
     for dirPath, dirNames, fileNames in os.walk(folder):
       for image_name in fileNames:
         images.append(image_name)
@@ -37,7 +39,7 @@ def get_File(file_dir):
   # To record the labels of the image dataset. ex: [0,0,1,1,2,2,2]
   labels = []
   count = 0
-  for a_folder in subfolders:
+  for a_folder in subfolder:
       n_img = len(os.listdir(a_folder))
       TFRecord_log.info('label - folder : %s %d',a_folder,count)
       labels = np.append(labels, n_img * [count])
@@ -50,7 +52,7 @@ def get_File(file_dir):
   image_list = list(subfolders[:, 0])
   label_list = list(subfolders[:, 1])
   label_list = [int(float(i)) for i in label_list]
-  return image_list, label_list
+  return image_list, label_list, folders
 
 def TFRecord_Writer(images, labels, images_dir,image_folder, TFrecord_name):
   n_samples = len(labels)
@@ -115,6 +117,6 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
-                            capacity=10000+3*Batch_Size,
-                            min_after_dequeue=1000)
+                            capacity=80+3*Batch_Size,
+                            min_after_dequeue=50)
     return images, labels
