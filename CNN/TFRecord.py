@@ -22,11 +22,12 @@ def get_File(file_dir):
   images = []
   # The subfolders
   subfolder = []
- 
+  folders = []
   # Using "os.walk" function to grab all the files in each folder
   for dirPath, dirNames, fileNames in os.walk(file_dir):
     for name in dirNames:
       subfolder.append(os.path.join(dirPath, name))
+      folders.append(name)
     
   for folder in subfolder:
     for dirPath, dirNames, fileNames in os.walk(folder):
