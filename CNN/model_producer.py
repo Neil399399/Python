@@ -1,6 +1,5 @@
 from TFRecord import get_File,TFRecord_Writer,TFRecord_Reader
 from utilities.log import TensorFlow_log
-from cnn import CNN_Model
 import tensorflow as tf
 import numpy as np
 # global value.
@@ -19,10 +18,23 @@ if __name__ =='__main__':
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH],name='tf_x')/255
     image = tf.reshape(tf_x, [-1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])              # (batch, height, width, channel)
-    tf_y = tf.placeholder(tf.float32, [None,one_hot_depth]) 
-    output = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,2,'same',tf.nn.relu,one_hot_depth)
+    tf_y = tf.placeholder(tf.float32, [None,one_hot_depth])
+    
+    # CNN.
+    output_shape = (IMAGE_HEIGHT/2**2)*(IMAGE_WIDTH/2**2)*36
+    # (image_height, image_width, Conv1_Filter)
+    conv1 = tf.layers.conv2d(inputs=image, filters=6, kernel_size=5, strides=1, padding='same', activation=tf.nn.relu,name='conv1')
+    pool1 = tf.layers.max_pooling2d(conv1,pool_size=2,strides=2,name='pool1')  # -> (image_height/Pool_Size, image_width/Pool_Size, Conv1_Filter)
+    # (image_height, image_width, Conv2_Filter)
+    conv2 = tf.layers.conv2d(pool1, 36, 5, 1, 'same', activation=tf.nn.relu,name='conv2')    
+    pool2 = tf.layers.max_pooling2d(conv2, 2, 2,name='pool2')
+    # flat.
+    flat = tf.reshape(pool2, [-1, int(output_shape)])
+    # output layer.
+    output = tf.layers.dense(flat, one_hot_depth,name='output')
 
-    # def.
+
+    # def loss, accuracy.
     loss = tf.losses.softmax_cross_entropy(onehot_labels=tf_y, logits=output)
     train_op = tf.train.AdamOptimizer(LR).minimize(loss)
     accuracy = tf.metrics.accuracy(labels=tf.argmax(tf_y, axis=1), predictions=tf.argmax(output, axis=1),)[1]
