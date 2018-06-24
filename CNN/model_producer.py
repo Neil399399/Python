@@ -7,7 +7,7 @@ import numpy as np
 IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
-one_hot_depth = 4
+one_hot_depth = 5
 LR = 0.001
 
 
@@ -57,7 +57,7 @@ if __name__ =='__main__':
         if step % 10 == 0:
             validate_accuracy = sess.run(accuracy,{tf_x: train_feature, tf_y: train_label_onehot})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
-            TensorFlow_log.info('loss : %s',loss)
+            TensorFlow_log.info('loss : %s',loss_)
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing.')
