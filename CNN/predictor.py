@@ -29,20 +29,21 @@ if __name__ =='__main__':
       
     
     # setting placeholder.
-    tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
-    image = tf.reshape(tf_x, [-1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])     # (batch, height, width, channel)
-    tf_y = tf.placeholder(tf.float32, [None,one_hot_depth])
-
+    # tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH])/255
+    # image = tf.reshape(tf_x, [-1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])     # (batch, height, width, channel)
+    # tf_y = tf.placeholder(tf.float32, [None,one_hot_depth])
     # Add ops to save and restore all the variables.
     # saver = tf.train.Saver()
-    saver = tf.train.import_meta_graph('./Model/CNN.Model-199.meta')
+    saver = tf.train.import_meta_graph('./Model/CNN.model-199.meta')
     # turn on tensorflow.
     sess = tf.Session()
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
-
+    graph = tf.get_default_graph()
+    w1 = graph.get_tensor_by_name('tf_x:0')
+    output = graph.get_tensor_by_name('output:0')
     # set test dict.
     saver.restore(sess,tf.train.latest_checkpoint('./Model'))
-    print(sess.run("output"))
+    print(output)
 
     # test_feature = sess.run(img)
 
