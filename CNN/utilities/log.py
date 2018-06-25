@@ -4,7 +4,7 @@ import logging
 logging.basicConfig(level=logging.DEBUG,
                     format='%(levelname)-3s %(asctime)s %(name)-3s %(message)s',
                     datefmt='%Y-%m-%d %H:%M:%S',
-                    handlers = [logging.FileHandler('my.log', 'a', 'utf-8'),])
+                    handlers = [logging.FileHandler('my.log', 'w', 'utf-8'),])
  
 # 定義 handler 輸出 sys.stderr
 console = logging.StreamHandler()

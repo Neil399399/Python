@@ -13,7 +13,8 @@ LR = 0.001
 if __name__ =='__main__':
     # train data.
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,30)
-    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord0',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+    test0_images,test0_labels = TFRecord_Reader('./TFRecord/test.tfrecord0',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+
 
     # setting placeholder.
     tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH],name='tf_x')/255
@@ -54,10 +55,10 @@ if __name__ =='__main__':
     train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
     # set test dict.
-    test_feature, test_label = sess.run([test_images,test_labels])
+    test0_feature, test0_label = sess.run([test0_images,test0_labels])
     # decode test_label to one_hot.
-    test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
-    
+    test0_label_onehot = sess.run(tf.one_hot(test0_label,one_hot_depth))
+
     # saver.
     saver = tf.train.Saver(max_to_keep=1)
 
@@ -73,16 +74,14 @@ if __name__ =='__main__':
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing.')
-    test_accuracy = sess.run(accuracy,{tf_x: test_feature, tf_y: test_label_onehot})
-    TensorFlow_log.info('Final accuracy : %.2f',test_accuracy)
-    test_output = sess.run(output, {tf_x: test_feature[:10]})
-    pred_y = np.argmax(test_output, 1)
-    TensorFlow_log.info('Prediction label : %s',pred_y)
-    TensorFlow_log.info('Real label : %s',test_label[:10])
+
+    test0_accuracy = sess.run(accuracy,{tf_x: test0_feature, tf_y: test0_label_onehot})
+    TensorFlow_log.info('Test0 accuracy : %.2f',test0_accuracy)
+
     # stop all threads
     coord.request_stop()
     coord.join(threads)
     TensorFlow_log.info('CNN training done.')
 
     # save model.
-    saver.save(sess,'./Model/CNN.model',global_step=step)
+    # saver.save(sess,'./Model/CNN.model',global_step=step)
