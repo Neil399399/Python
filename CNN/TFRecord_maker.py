@@ -22,8 +22,8 @@ if __name__ =='__main__':
     if not os.path.exists('./TFRecord'):
         os.makedirs('./TFRecord')
 
-    train_image_list,train_label_list, folders = get_File(train_Dir)
-    test_image_list,test_label_list, folders = get_File(test_Dir)
+    train_image_list,train_label_list, folders = get_File(train_Dir,'train')
+    test_image_list,test_label_list, folders = get_File(test_Dir,'test')
 
     # make train tfrecord.
     TFRecord_Writer(train_image_list,train_label_list,'./','train',tfrecord_dir,'train.tfrecord')

@@ -8,14 +8,15 @@ import numpy as np
 IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
-one_hot_depth = 5
+one_hot_depth = 10
 LR = 0.001
+dropout = 0.4
 
 
 if __name__ =='__main__':
     # train data.
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,30)
-    # test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord0',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
 
 
     # setting placeholder.
@@ -64,10 +65,10 @@ if __name__ =='__main__':
     # decode train_label to one_hot.
     train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
-    # # set test dict.
-    # test_feature, test_label = sess.run([test_images,test_labels])
-    # # decode test_label to one_hot.
-    # test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
+    # set test dict.
+    test_feature, test_label = sess.run([test_images,test_labels])
+    # decode test_label to one_hot.
+    test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
 
     # saver.
     saver = tf.train.Saver(max_to_keep=1)
@@ -81,11 +82,11 @@ if __name__ =='__main__':
     TensorFlow_log.info('Make graph and start trainng.')
     for step in range(201):
         TensorFlow_log.info('Training step :%d',step)
-        _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
-        summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
+        _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
+        summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
 
         if step % 10 == 0:
-            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
+            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
             TensorFlow_log.info('loss : %s',loss_)
             train_writer.add_summary(summary_acc,step)
@@ -97,12 +98,12 @@ if __name__ =='__main__':
     temp_precision = 0
     temp_recall = 0
 
-    test_output = sess.run(output, {tf_x: train_feature,keep_prob:0.5})
+    test_output = sess.run(output, {tf_x: test_feature,keep_prob:dropout})
     predictions = np.argmax(test_output, 1)
-    labels = np.argmax(train_label_onehot, 1)
-    test_summary_acc,test_accuracy = sess.run([merged,accuracy],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
-    test_precision = sess.run(precision,{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
-    test_recall = sess.run(recall,{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:0.5})
+    labels = np.argmax(test_label_onehot, 1)
+    test_summary_acc,test_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
+    test_precision = sess.run(precision,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
+    test_recall = sess.run(recall,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
     test_writer.add_summary(test_summary_acc,step)
 
     print(test_precision,test_recall)
@@ -122,6 +123,21 @@ if __name__ =='__main__':
     # 4
     test_precision_label4 = Precision(predictions,labels,4)
     test_recall_label4 = Recall(predictions,labels,4)
+    # 5
+    test_precision_label4 = Precision(predictions,labels,5)
+    test_recall_label4 = Recall(predictions,labels,5)
+    # 6
+    test_precision_label4 = Precision(predictions,labels,6)
+    test_recall_label4 = Recall(predictions,labels,6)
+    # 7
+    test_precision_label4 = Precision(predictions,labels,7)
+    test_recall_label4 = Recall(predictions,labels,7)
+    # 8
+    test_precision_label4 = Precision(predictions,labels,8)
+    test_recall_label4 = Recall(predictions,labels,8)
+    # 9
+    test_precision_label4 = Precision(predictions,labels,9)
+    test_recall_label4 = Recall(predictions,labels,9)
 
     # Final model info.
   
@@ -150,8 +166,31 @@ if __name__ =='__main__':
     TensorFlow_log.info('Class 4 precision : %.2f',test_precision_label4)
     TensorFlow_log.info('Class 4 recall : %.2f',test_recall_label4)
     TensorFlow_log.info('Class 4 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label4))
+    
+    print('--------------------------------------------------------------')
+    TensorFlow_log.info('Class 5 precision : %.2f',test_precision_label5)
+    TensorFlow_log.info('Class 5 recall : %.2f',test_recall_label5)
+    TensorFlow_log.info('Class 5 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label5))
 
+    print('--------------------------------------------------------------')
+    TensorFlow_log.info('Class 6 precision : %.2f',test_precision_label6)
+    TensorFlow_log.info('Class 6 recall : %.2f',test_recall_label6)
+    TensorFlow_log.info('Class 6 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label6))
 
+    print('--------------------------------------------------------------')
+    TensorFlow_log.info('Class 7 precision : %.2f',test_precision_label7)
+    TensorFlow_log.info('Class 7 recall : %.2f',test_recall_label7)
+    TensorFlow_log.info('Class 7 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label7))
+
+    print('--------------------------------------------------------------')
+    TensorFlow_log.info('Class 8 precision : %.2f',test_precision_label8)
+    TensorFlow_log.info('Class 8 recall : %.2f',test_recall_label8)
+    TensorFlow_log.info('Class 8 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label8))
+
+    print('--------------------------------------------------------------')
+    TensorFlow_log.info('Class 9 precision : %.2f',test_precision_label9)
+    TensorFlow_log.info('Class 9 recall : %.2f',test_recall_label9)
+    TensorFlow_log.info('Class 9 f1 score : %.2f',F1_Score(test_precision_label4,test_recall_label9))
     # close queue.
     coord.request_stop()
     coord.join(threads)

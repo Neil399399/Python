@@ -17,7 +17,7 @@ def int64_feature(value):
 def float32_feature(value):
   return tf.train.Feature(float_list=tf.train.FloatList(value=value))
 
-def get_File(file_dir):
+def get_File(file_dir,filename):
   # The images in each subfolder
   images = []
   # The subfolders
@@ -34,7 +34,10 @@ def get_File(file_dir):
       for image_name in fileNames:
         images.append(image_name)
         # copy file to make training data.
-        copy(os.path.join(dirPath, image_name),'./train/')
+        if filename == 'train':
+          copy(os.path.join(dirPath, image_name),'./train/')
+        if filename == 'test':
+          copy(os.path.join(dirPath, image_name),'./test/')
   
   # To record the labels of the image dataset. ex: [0,0,1,1,2,2,2]
   labels = []
