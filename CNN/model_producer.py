@@ -27,7 +27,7 @@ if __name__ =='__main__':
         keep_prob = tf.placeholder(tf.float32,name='dropout')
 
     # CNN.
-    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,64,128,2,'same',tf.nn.relu,one_hot_depth)
+    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,108,216,2,'same',tf.nn.relu,one_hot_depth)
     output = tf.nn.dropout(result,keep_prob)
 
     # def loss, accuracy.

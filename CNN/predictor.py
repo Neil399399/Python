@@ -8,7 +8,7 @@ import numpy as np
 IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
-one_hot_depth = 4
+one_hot_depth = 10
 
 
 if __name__ =='__main__':
