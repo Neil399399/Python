@@ -121,5 +121,5 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
                             [resized_image, label],
                             batch_size= Batch_Size,
                             capacity=100+3*Batch_Size,
-                            min_after_dequeue=70)
+                            min_after_dequeue=80)
     return images, labels
