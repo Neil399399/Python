@@ -10,7 +10,7 @@ IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 10
 LR = 0.001
-dropout = 0.4
+dropout = 0.5
 
 
 if __name__ =='__main__':
@@ -27,7 +27,7 @@ if __name__ =='__main__':
         keep_prob = tf.placeholder(tf.float32,name='dropout')
 
     # CNN.
-    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,2,'same',tf.nn.relu,one_hot_depth)
+    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,3,64,128,2,'same',tf.nn.relu,one_hot_depth)
     output = tf.nn.dropout(result,keep_prob)
 
     # def loss, accuracy.
@@ -124,20 +124,20 @@ if __name__ =='__main__':
     test_precision_label4 = Precision(predictions,labels,4)
     test_recall_label4 = Recall(predictions,labels,4)
     # 5
-    test_precision_label4 = Precision(predictions,labels,5)
-    test_recall_label4 = Recall(predictions,labels,5)
+    test_precision_label5 = Precision(predictions,labels,5)
+    test_recall_label5 = Recall(predictions,labels,5)
     # 6
-    test_precision_label4 = Precision(predictions,labels,6)
-    test_recall_label4 = Recall(predictions,labels,6)
+    test_precision_label6 = Precision(predictions,labels,6)
+    test_recall_label6 = Recall(predictions,labels,6)
     # 7
-    test_precision_label4 = Precision(predictions,labels,7)
-    test_recall_label4 = Recall(predictions,labels,7)
+    test_precision_label7 = Precision(predictions,labels,7)
+    test_recall_label7 = Recall(predictions,labels,7)
     # 8
-    test_precision_label4 = Precision(predictions,labels,8)
-    test_recall_label4 = Recall(predictions,labels,8)
+    test_precision_label8 = Precision(predictions,labels,8)
+    test_recall_label8 = Recall(predictions,labels,8)
     # 9
-    test_precision_label4 = Precision(predictions,labels,9)
-    test_recall_label4 = Recall(predictions,labels,9)
+    test_precision_label9 = Precision(predictions,labels,9)
+    test_recall_label9 = Recall(predictions,labels,9)
 
     # Final model info.
   
