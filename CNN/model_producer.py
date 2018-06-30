@@ -36,7 +36,7 @@ if __name__ =='__main__':
     tf.summary.scalar('loss',loss)
 
     with tf.name_scope('Train'):
-        train_op = tf.train.f.train.GradientDescentOptimizer(LR).minimize(loss)
+        train_op = tf.train.GradientDescentOptimizer(LR).minimize(loss)
     tf.summary.scalar('leaning_rate',LR)
 
     with tf.name_scope('Accuracy'):
