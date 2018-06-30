@@ -15,8 +15,8 @@ dropout = 0.5
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
-    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,40)
+    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,40)
 
 
     # setting placeholder.
@@ -86,7 +86,7 @@ if __name__ =='__main__':
         summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
 
         if step % 10 == 0:
-            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
+            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
             TensorFlow_log.info('loss : %s',loss_)
             train_writer.add_summary(summary_acc,step)
