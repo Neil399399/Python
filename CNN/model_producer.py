@@ -9,7 +9,7 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 10
-LR = 0.01
+LR = 0.001
 dropout = 0.4
 
 
@@ -21,7 +21,7 @@ if __name__ =='__main__':
 
     # setting placeholder.
     with tf.name_scope('Input'):
-        tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH],name='tf_x')/255
+        tf_x = tf.placeholder(tf.float32, [None, IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH],name='tf_x')
         image = tf.reshape(tf_x, [-1, IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])              # (batch, height, width, channel)
         tf_y = tf.placeholder(tf.float32, [None,one_hot_depth],name='tf_y')
         keep_prob = tf.placeholder(tf.float32,name='dropout')
