@@ -10,7 +10,7 @@ IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 10
 LR = 0.001
-dropout = 0.5
+dropout = 0.4
 
 
 if __name__ =='__main__':
@@ -36,7 +36,7 @@ if __name__ =='__main__':
     tf.summary.scalar('loss',loss)
 
     with tf.name_scope('Train'):
-        train_op = tf.train.AdamOptimizer(LR).minimize(loss)
+        train_op = tf.train.f.train.GradientDescentOptimizer(LR).minimize(loss)
     tf.summary.scalar('leaning_rate',LR)
 
     with tf.name_scope('Accuracy'):
