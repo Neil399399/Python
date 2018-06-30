@@ -80,7 +80,7 @@ if __name__ =='__main__':
 
     # training.
     TensorFlow_log.info('Make graph and start trainng.')
-    for step in range(201):
+    for step in range(501):
         TensorFlow_log.info('Training step :%d',step)
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
         summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
