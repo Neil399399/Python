@@ -9,7 +9,7 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 10
-LR = 0.001
+LR = 0.01
 dropout = 0.4
 
 
