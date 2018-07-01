@@ -120,6 +120,6 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
-                            capacity=100+3*Batch_Size,
-                            min_after_dequeue=100)
+                            capacity=80+3*Batch_Size,
+                            min_after_dequeue=80)
     return images, labels
