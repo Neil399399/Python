@@ -15,7 +15,7 @@ dropout = 0.4
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,60)
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,70)
     test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,20)
 
 
@@ -27,7 +27,7 @@ if __name__ =='__main__':
         keep_prob = tf.placeholder(tf.float32,name='dropout')
 
     # CNN.
-    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,108,216,2,'same',tf.nn.relu,one_hot_depth)
+    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,216,2,'same',tf.nn.relu,one_hot_depth)
     output = tf.nn.dropout(result,keep_prob)
 
     # def loss, accuracy.
