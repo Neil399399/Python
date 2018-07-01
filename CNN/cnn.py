@@ -2,7 +2,7 @@ import tensorflow as tf
 
 def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Conv3_Filter ,Pool_Size, Padding, Activation_Function, output_layer_units):
     # CNN.
-    output_shape = (Image_height/Pool_Size**4)*(Image_width/Pool_Size**4)*Conv3_Filter
+    output_shape = (Image_height/Pool_Size**3)*(Image_width/Pool_Size**3)*Conv3_Filter
     # (image_height, image_width, Conv1_Filter)
     conv1 = tf.layers.conv2d(inputs=Image, filters=Conv1_Filter, kernel_size=5, strides=1, padding=Padding, activation=Activation_Function,name='conv1')
     pool1 = tf.layers.max_pooling2d(conv1,pool_size=Pool_Size,strides=2,name='pool1')  # -> (image_height/Pool_Size, image_width/Pool_Size, Conv1_Filter)
