@@ -1,3 +1,5 @@
+import csv
+
 def Precision(predictions,labels,label):
     TP = 0
     FP = 0
@@ -34,3 +36,9 @@ def F1_Score(precision,recall):
         return 0
     else:
         return (2*precision*recall/(precision+recall))
+
+
+def Writer(file,input):
+    with open(file,'a',newline='') as csvfile:
+        writer = csv.writer(csvfile,delimiter=',')
+        writer.writerow(input)
