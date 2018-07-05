@@ -85,6 +85,7 @@ class Vgg16:
         else:   # training graph
             with tf.name_scope('Loss'):
                 self.loss = tf.losses.mean_squared_error(labels=self.tfy, predictions=self.out)
+                self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
             tf.summary.scalar('loss',self.loss)
             with tf.name_scope('Accuracy'):
                 self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
@@ -95,7 +96,6 @@ class Vgg16:
             with tf.name_scope('Recall'):
                 self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('recall',self.recall)
-            self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
             self.sess.run(self.init_op)
             # tensorboard.
             self.merged = tf.summary.merge_all()
