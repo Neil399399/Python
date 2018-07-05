@@ -96,6 +96,10 @@ class Vgg16:
             with tf.name_scope('Recall'):
                 self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('recall',self.recall)
+
+            # open queue.
+            self.coord = tf.train.Coordinator()
+            self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
             self.sess.run(self.init_op)
             # tensorboard.
             self.merged = tf.summary.merge_all()
@@ -135,3 +139,16 @@ class Vgg16:
     def save(self, path='./for_transfer_learning/model/transfer_learn'):
         saver = tf.train.Saver()
         saver.save(self.sess, path, write_meta_graph=False)
+
+    def load_data(self,train_x,test_x,train_y,test_y,one_hot_depth):
+        # set train dict.
+        train_feature, train_label = self.sess.run([train_x,train_y])
+        # decode train_label to one_hot.
+        train_label_onehot = self.sess.run(tf.one_hot(train_label,one_hot_depth))
+
+        # set test dict.
+        test_feature, test_label = self.sess.run([test_x,test_y])
+        # decode test_label to one_hot.
+        test_label_onehot = self.sess.run(tf.one_hot(test_label,one_hot_depth))
+
+        return train_feature,train_label_onehot,test_feature,test_label_onehot

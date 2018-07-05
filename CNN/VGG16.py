@@ -36,9 +36,9 @@ if __name__ =='__main__':
     test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
 
     TensorFlow_log.info('Make graph and start training.')
+    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
     for step in range(101):
-        vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
-        train_loss = vgg.train(train_feature,train_label_onehot,)
+        train_loss = vgg.train(train_feature,train_label_onehot)
         TensorFlow_log.info('train step: %d ,loss: %s',step,train_loss)
         if step % 10 == 0:
            loss, accuracy, precision, recall = vgg.validate(test_feature,test_label_onehot)
