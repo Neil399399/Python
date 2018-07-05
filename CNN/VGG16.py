@@ -17,26 +17,28 @@ if __name__ =='__main__':
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,50)
     test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,30)
 
-    sess = tf.Session()
-    init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+    # sess = tf.Session()
+    # init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 
-    # open queue.
-    coord = tf.train.Coordinator()
-    threads = tf.train.start_queue_runners(sess=sess,coord=coord)
-    sess.run(init_op)
+    # # open queue.
+    # coord = tf.train.Coordinator()
+    # threads = tf.train.start_queue_runners(sess=sess,coord=coord)
+    # sess.run(init_op)
 
-    # set train dict.
-    train_feature, train_label = sess.run([train_images,train_labels])
-    # decode train_label to one_hot.
-    train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
+    # # set train dict.
+    # train_feature, train_label = sess.run([train_images,train_labels])
+    # # decode train_label to one_hot.
+    # train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
-    # set test dict.
-    test_feature, test_label = sess.run([test_images,test_labels])
-    # decode test_label to one_hot.
-    test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
+    # # set test dict.
+    # test_feature, test_label = sess.run([test_images,test_labels])
+    # # decode test_label to one_hot.
+    # test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
+
+    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
+    train_feature,train_label_onehot,test_feature,test_label_onehot= vgg.load_data(train_images,test_images,train_labels,test_labels,6)
 
     TensorFlow_log.info('Make graph and start training.')
-    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
     for step in range(101):
         train_loss = vgg.train(train_feature,train_label_onehot)
         TensorFlow_log.info('train step: %d ,loss: %s',step,train_loss)
@@ -45,6 +47,6 @@ if __name__ =='__main__':
            TensorFlow_log.info('Step %d',step)
            TensorFlow_log.info('Loss: %s , Acc: %.2f , Precision: %.2f , Recall: %.2f',loss,accuracy,precision,recall)
     # close queue.
-    coord.request_stop()
-    coord.join(threads)
+    # coord.request_stop()
+    # coord.join(threads)
     TensorFlow_log.info('CNN training done.')
