@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from utilities.log import TensorFlow_log
 
 def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Conv3_Filter ,Pool_Size, Padding, Activation_Function, output_layer_units):
     # CNN.
@@ -152,3 +153,13 @@ class Vgg16:
         test_label_onehot = self.sess.run(tf.one_hot(test_label,one_hot_depth))
 
         return train_feature,train_label_onehot,test_feature,test_label_onehot
+
+def Train(train_x,train_y,test_x,test_y):
+    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
+    for step in range(101):
+        train_loss = vgg.train(train_x,train_y)
+        TensorFlow_log.info('train step: %d ,loss: %s',step,train_loss)
+        if step % 10 == 0:
+           loss, accuracy, precision, recall = vgg.validate(test_x,test_y)
+           TensorFlow_log.info('Step %d',step)
+           TensorFlow_log.info('Loss: %s , Acc: %.2f , Precision: %.2f , Recall: %.2f',loss,accuracy,precision,recall)
