@@ -1,6 +1,6 @@
 import tensorflow as tf
 import numpy as np
-from cnn import Vgg16,Train
+from cnn import Vgg16
 from skimage import io
 from TFRecord import get_File,TFRecord_Writer,TFRecord_Reader
 from utilities.log import TensorFlow_log
