@@ -86,13 +86,13 @@ class Vgg16:
             tf.summary.scalar('loss',self.loss)
             self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
             with tf.name_scope('Accuracy'):
-                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='accuracy')
             tf.summary.scalar('accuracy',self.accuracy)
             with tf.name_scope('Precision'):
-                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='precision')
             tf.summary.scalar('precision',self.precision)
             with tf.name_scope('Recall'):
-                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='recall')
             tf.summary.scalar('recall',self.recall)
 
             self.sess.run(tf.global_variables_initializer())
@@ -115,10 +115,10 @@ class Vgg16:
         return loss
 
     def validate(self, x, y):
-        loss = self.sess.run(self.loss, {self.tfx: x, self.tfy: y})
-        accuracy = self.sess.run(self.accuracy,{self.tfx: x, self.tfy: y})
-        precision = self.sess.run(self.precision,{self.tfx: x, self.tfy: y})
-        recall = self.sess.run(self.recall,{self.tfx: x, self.tfy: y})
+        _, loss = self.sess.run([self.merged, self.loss], {self.tfx: x, self.tfy: y})
+        _,accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: x, self.tfy: y})
+        _,precision = self.sess.run([self.merged, self.precision],{self.tfx: x, self.tfy: y})
+        _,recall = self.sess.run([self.merged, self.recall],{self.tfx: x, self.tfy: y})
         return loss, accuracy, precision, recall
 
     # def predict(self, paths):
