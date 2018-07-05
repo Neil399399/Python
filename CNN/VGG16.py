@@ -7,8 +7,8 @@ from utilities.log import TensorFlow_log
 from utilities.util import F1_Score,Precision,Recall
 
 # global value.
-IMAGE_HEIGHT = 224
-IMAGE_WIDTH = 224
+IMAGE_HEIGHT = 640
+IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 6
 

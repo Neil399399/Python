@@ -116,7 +116,7 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
     except:
       TFRecord_log.error('Reshape image failed !!')
     # regulate images size.
-    resized_image = tf.image.resize_image_with_crop_or_pad(image=img,target_height=IMAGE_HEIGHT,target_width=IMAGE_WIDTH)
+    resized_image = tf.image.resize_image_with_crop_or_pad(image=img,target_height=224,target_width=224)
     images, labels = tf.train.shuffle_batch(
                             [resized_image, label],
                             batch_size= Batch_Size,
