@@ -88,7 +88,6 @@ class Vgg16:
             tf.summary.scalar('loss',self.loss)
             with tf.name_scope('Training_rate'):
                 self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
-            tf.summary.scalar('rate',self.train_op)
             with tf.name_scope('Accuracy'):
                 self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('accuracy',self.accuracy)
