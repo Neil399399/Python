@@ -85,6 +85,10 @@ class Vgg16:
 
         self.sess = tf.Session()
         self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        # open queue.
+        self.coord = tf.train.Coordinator()
+        self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
+        self.sess.run(self.init_op)
 
         # set train dict.
         self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
@@ -114,10 +118,6 @@ class Vgg16:
                 self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('recall',self.recall)
 
-            # open queue.
-            self.coord = tf.train.Coordinator()
-            self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
-            self.sess.run(self.init_op)
             # tensorboard.
             self.merged = tf.summary.merge_all()
             # self.train_writer = tf.summary.FileWriter('TensorBoard/train/',graph=self.sess.graph)
