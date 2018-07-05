@@ -86,16 +86,16 @@ class Vgg16:
             tf.summary.scalar('loss',self.loss)
             self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
             with tf.name_scope('Accuracy'):
-                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='accuracy')
+                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('accuracy',self.accuracy)
             with tf.name_scope('Precision'):
-                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='precision')
+                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('precision',self.precision)
             with tf.name_scope('Recall'):
-                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1),name='recall')
+                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('recall',self.recall)
 
-            self.sess.run(tf.global_variables_initializer())
+            self.sess.run(tf.global_variables_initializer(),tf.local_variables_initializer())
             # tensorboard.
             self.merged = tf.summary.merge_all()
             # self.train_writer = tf.summary.FileWriter('TensorBoard/train/',graph=self.sess.graph)
