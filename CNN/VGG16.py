@@ -39,7 +39,7 @@ if __name__ =='__main__':
     for step in range(101):
         vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6)
         train_loss = vgg.train(train_feature,train_label_onehot)
-        print('train step: %d',step,train_loss)
+        print('train step: %d, loss: %s',step,train_loss)
         if step % 10 == 0:
            loss, accuracy, precision, recall = vgg.validate(test_feature,test_label_onehot)
            print('Step',step)
