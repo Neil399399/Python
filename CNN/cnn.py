@@ -83,8 +83,21 @@ class Vgg16:
         # open queue.
         self.coord = tf.train.Coordinator()
         self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
-        self.train_feature, self.train_label_onehot, self.test_feature, self.test_label_onehot = self.load_data(output_layer_units)
         
+        TensorFlow_log.info('load train data')
+        # load data.
+        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
+        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
+
+        # set train dict.
+        self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
+        # decode train_label to one_hot.
+        self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
+        # set test dict.
+        self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
+        # decode test_label to one_hot.
+        self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
+
         if restore_from:
             saver = tf.train.Saver()
             saver.restore(self.sess, restore_from)
@@ -145,23 +158,6 @@ class Vgg16:
         summary_pre, precision = self.sess.run([self.merged, self.precision],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
         summary_rec,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
         return loss, accuracy, precision, recall, summary_loss, summary_acc, summary_pre,summary_rec
-
-    def load_data(self,output_layer_units):
-        TensorFlow_log.info('load train data')
-        # load data.
-        train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
-        test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
-
-        # set train dict.
-        train_feature, train_label = self.sess.run([train_images,train_labels])
-        # decode train_label to one_hot.
-        train_label_onehot = self.sess.run(tf.one_hot(train_label,output_layer_units))
-        # set test dict.
-        test_feature, test_label = self.sess.run([test_images,test_labels])
-        # decode test_label to one_hot.
-        test_label_onehot = self.sess.run(tf.one_hot(test_label,output_layer_units))
-        return train_feature, train_label_onehot, test_feature, test_label_onehot
-
 
     # def predict(self, paths):
     #     fig, axs = plt.subplots(1, 2)
