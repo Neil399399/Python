@@ -78,6 +78,7 @@ class Vgg16:
 
         self.sess = tf.Session()
         self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+        
         if restore_from:
             saver = tf.train.Saver()
             saver.restore(self.sess, restore_from)
@@ -85,7 +86,9 @@ class Vgg16:
             with tf.name_scope('Loss'):
                 self.loss = tf.losses.mean_squared_error(labels=self.tfy, predictions=self.out)
             tf.summary.scalar('loss',self.loss)
-            self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
+            with tf.name_scope('Training_rate'):
+                self.train_op = tf.train.RMSPropOptimizer(0.001).minimize(self.loss)
+            tf.summary.scalar('rate',self.train_op)
             with tf.name_scope('Accuracy'):
                 self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
             tf.summary.scalar('accuracy',self.accuracy)
