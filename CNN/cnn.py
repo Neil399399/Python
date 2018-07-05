@@ -31,6 +31,11 @@ class Vgg16:
 
     def __init__(self, vgg16_npy_path=None, restore_from=None,output_layer_units=None,LR=None):
 
+        TensorFlow_log.info('load train data')
+        # load data.
+        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
+        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
+        
         # pre-trained parameters
         TensorFlow_log.info('Start pretrain')
         try:
@@ -83,11 +88,6 @@ class Vgg16:
         # open queue.
         self.coord = tf.train.Coordinator()
         self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
-        
-        TensorFlow_log.info('load train data')
-        # load data.
-        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
-        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
 
         # set train dict.
         self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
