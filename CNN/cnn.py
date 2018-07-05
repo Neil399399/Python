@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from TFRecord import get_File,TFRecord_Writer,TFRecord_Reader
 from utilities.log import TensorFlow_log
 
 def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Conv3_Filter ,Pool_Size, Padding, Activation_Function, output_layer_units):
@@ -29,6 +30,11 @@ class Vgg16:
     vgg_mean = [103.939, 116.779, 123.68]
 
     def __init__(self, vgg16_npy_path=None, restore_from=None,output_layer_units=None,LR=None):
+        TensorFlow_log.info('load train')
+        # load data.
+        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
+        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
+
         # pre-trained parameters
         print('Start pretrain')
         try:
@@ -79,6 +85,16 @@ class Vgg16:
 
         self.sess = tf.Session()
         self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+
+        # set train dict.
+        self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
+        # decode train_label to one_hot.
+        self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
+
+        # set test dict.
+        self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
+        # decode test_label to one_hot.
+        self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
         
         if restore_from:
             saver = tf.train.Saver()
@@ -116,15 +132,24 @@ class Vgg16:
             lout = tf.nn.relu(tf.nn.bias_add(conv, self.data_dict[name][1]))
             return lout
 
-    def train(self, x, y):
-        loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: x, self.tfy: y})
-        return loss
+    def train(self):
+        for step in range(101): 
+            loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+            print(loss)
+            if step %10 == 0:
+                loss, accuracy, precision, recall= self.validate()
+                print(loss, accuracy, precision, recall)
+        # close queue.
+        self.coord.request_stop()
+        self.coord.join(self.threads)
+        TensorFlow_log.info('CNN training done.')
+                
 
-    def validate(self, x, y):
-        _, loss = self.sess.run([self.merged, self.loss], {self.tfx: x, self.tfy: y})
-        _,accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: x, self.tfy: y})
-        _,precision = self.sess.run([self.merged, self.precision],{self.tfx: x, self.tfy: y})
-        _,recall = self.sess.run([self.merged, self.recall],{self.tfx: x, self.tfy: y})
+    def validate(self):
+        _, loss = self.sess.run([self.merged, self.loss], {self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        _,accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        _,precision = self.sess.run([self.merged, self.precision],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        _,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
         return loss, accuracy, precision, recall
 
     # def predict(self, paths):
@@ -140,26 +165,3 @@ class Vgg16:
     def save(self, path='./for_transfer_learning/model/transfer_learn'):
         saver = tf.train.Saver()
         saver.save(self.sess, path, write_meta_graph=False)
-
-    def load_data(self,train_x,test_x,train_y,test_y,one_hot_depth):
-        # set train dict.
-        train_feature, train_label = self.sess.run([train_x,train_y])
-        # decode train_label to one_hot.
-        train_label_onehot = self.sess.run(tf.one_hot(train_label,one_hot_depth))
-
-        # set test dict.
-        test_feature, test_label = self.sess.run([test_x,test_y])
-        # decode test_label to one_hot.
-        test_label_onehot = self.sess.run(tf.one_hot(test_label,one_hot_depth))
-
-        return train_feature,train_label_onehot,test_feature,test_label_onehot
-
-def Train(train_x,train_y,test_x,test_y):
-    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
-    for step in range(101):
-        train_loss = vgg.train(train_x,train_y)
-        TensorFlow_log.info('train step: %d ,loss: %s',step,train_loss)
-        if step % 10 == 0:
-           loss, accuracy, precision, recall = vgg.validate(test_x,test_y)
-           TensorFlow_log.info('Step %d',step)
-           TensorFlow_log.info('Loss: %s , Acc: %.2f , Precision: %.2f , Recall: %.2f',loss,accuracy,precision,recall)
