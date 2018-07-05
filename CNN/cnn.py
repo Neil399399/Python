@@ -30,13 +30,9 @@ class Vgg16:
     vgg_mean = [103.939, 116.779, 123.68]
 
     def __init__(self, vgg16_npy_path=None, restore_from=None,output_layer_units=None,LR=None):
-        TensorFlow_log.info('load train')
-        # load data.
-        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
-        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
 
         # pre-trained parameters
-        print('Start pretrain')
+        TensorFlow_log.info('Start pretrain')
         try:
             self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         except FileNotFoundError:
@@ -83,21 +79,11 @@ class Vgg16:
         self.fc6 = tf.layers.dense(self.flatten, 256, tf.nn.relu, name='fc6')
         self.out = tf.layers.dense(self.fc6, output_layer_units, name='output')
 
-
         self.sess = tf.Session()
         # open queue.
         self.coord = tf.train.Coordinator()
         self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
-
-        # set train dict.
-        self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
-        # decode train_label to one_hot.
-        self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
-
-        # set test dict.
-        self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
-        # decode test_label to one_hot.
-        self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
+        self.train_feature, self.train_label_onehot, self.test_feature, self.test_label_onehot = self.load_data(output_layer_units)
         
         if restore_from:
             saver = tf.train.Saver()
@@ -121,9 +107,8 @@ class Vgg16:
             self.merged = tf.summary.merge_all()
             self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
             self.sess.run(self.init_op)
-
-            # self.train_writer = tf.summary.FileWriter('TensorBoard/train/',graph=self.sess.graph)
-            # self.test_writer = tf.summary.FileWriter('TensorBoard/test/',graph=self.sess.graph)
+            self.train_writer = tf.summary.FileWriter('TensorBoard/train/',graph=self.sess.graph)
+            self.test_writer = tf.summary.FileWriter('TensorBoard/test/',graph=self.sess.graph)
 
     def max_pool(self, bottom, name):
         return tf.nn.max_pool(bottom, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME', name=name)
@@ -134,13 +119,20 @@ class Vgg16:
             lout = tf.nn.relu(tf.nn.bias_add(conv, self.data_dict[name][1]))
             return lout
 
-    def train(self):
-        for step in range(101): 
+    def train(self,learning_step):
+        for step in range(learning_step): 
             loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
-            print(loss)
+            summary_tloss, _ = self.sess.run([self.merged, self.loss], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+            TensorFlow_log.info('Step %d , Loss: %s',step,loss)
+            self.train_writer.add_summary(summary_tloss,step)
+
             if step %10 == 0:
-                loss, accuracy, precision, recall= self.validate()
-                print(loss, accuracy, precision, recall)
+                loss, accuracy, precision, recall, summary_loss, summary_acc, summary_pre,summary_rec = self.validate()
+                self.test_writer.add_summary(summary_loss,step)
+                self.test_writer.add_summary(summary_acc,step)
+                self.test_writer.add_summary(summary_pre,step)
+                self.test_writer.add_summary(summary_rec,step)
+                TensorFlow_log.info('Loss: %s ,Acc: %.2f ,Precision: %.2f ,Recall: %.2f ',loss, accuracy, precision, recall)
         # close queue.
         self.coord.request_stop()
         self.coord.join(self.threads)
@@ -148,11 +140,28 @@ class Vgg16:
                 
 
     def validate(self):
-        _, loss = self.sess.run([self.merged, self.loss], {self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        _,accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        _,precision = self.sess.run([self.merged, self.precision],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        _,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        return loss, accuracy, precision, recall
+        summary_loss, loss = self.sess.run([self.merged, self.loss], {self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        summary_acc, accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        summary_pre, precision = self.sess.run([self.merged, self.precision],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        summary_rec,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        return loss, accuracy, precision, recall, summary_loss, summary_acc, summary_pre,summary_rec
+
+    def load_data(self,output_layer_units):
+        TensorFlow_log.info('load train data')
+        # load data.
+        train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
+        test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
+
+        # set train dict.
+        train_feature, train_label = self.sess.run([train_images,train_labels])
+        # decode train_label to one_hot.
+        train_label_onehot = self.sess.run(tf.one_hot(train_label,output_layer_units))
+        # set test dict.
+        test_feature, test_label = self.sess.run([test_images,test_labels])
+        # decode test_label to one_hot.
+        test_label_onehot = self.sess.run(tf.one_hot(test_label,output_layer_units))
+        return train_feature, train_label_onehot, test_feature, test_label_onehot
+
 
     # def predict(self, paths):
     #     fig, axs = plt.subplots(1, 2)
