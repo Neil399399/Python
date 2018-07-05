@@ -29,6 +29,7 @@ class Vgg16:
 
     def __init__(self, vgg16_npy_path=None, restore_from=None,output_layer_units=None):
         # pre-trained parameters
+        print('Start pretrain')
         try:
             self.data_dict = np.load(vgg16_npy_path, encoding='latin1').item()
         except FileNotFoundError:
