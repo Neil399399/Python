@@ -83,12 +83,11 @@ class Vgg16:
         self.fc6 = tf.layers.dense(self.flatten, 256, tf.nn.relu, name='fc6')
         self.out = tf.layers.dense(self.fc6, output_layer_units, name='output')
 
+
         self.sess = tf.Session()
-        self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
         # open queue.
         self.coord = tf.train.Coordinator()
         self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
-        self.sess.run(self.init_op)
 
         # set train dict.
         self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
@@ -109,17 +108,20 @@ class Vgg16:
             tf.summary.scalar('loss',self.loss)
             self.train_op = tf.train.RMSPropOptimizer(LR).minimize(self.loss)
             with tf.name_scope('Accuracy'):
-                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
             tf.summary.scalar('accuracy',self.accuracy)
             with tf.name_scope('Precision'):
-                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
             tf.summary.scalar('precision',self.precision)
             with tf.name_scope('Recall'):
-                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))
+                self.recall = tf.metrics.recall(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
             tf.summary.scalar('recall',self.recall)
 
             # tensorboard.
             self.merged = tf.summary.merge_all()
+            self.init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+            self.sess.run(self.init_op)
+
             # self.train_writer = tf.summary.FileWriter('TensorBoard/train/',graph=self.sess.graph)
             # self.test_writer = tf.summary.FileWriter('TensorBoard/test/',graph=self.sess.graph)
 
