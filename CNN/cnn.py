@@ -115,10 +115,10 @@ class Vgg16:
         return loss
 
     def validate(self, x, y):
-        _, loss = self.sess.run([self.merged, self.loss], {self.tfx: x, self.tfy: y})
-        _,accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: x, self.tfy: y})
-        _,precision = self.sess.run([self.merged, self.precision],{self.tfx: x, self.tfy: y})
-        _,recall = self.sess.run([self.merged, self.recall],{self.tfx: x, self.tfy: y})
+        loss = self.sess.run(self.loss, {self.tfx: x, self.tfy: y})
+        accuracy = self.sess.run(self.accuracy,{self.tfx: x, self.tfy: y})
+        precision = self.sess.run(self.precision,{self.tfx: x, self.tfy: y})
+        recall = self.sess.run(self.recall,{self.tfx: x, self.tfy: y})
         return loss, accuracy, precision, recall
 
     # def predict(self, paths):
