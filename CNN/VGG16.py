@@ -17,9 +17,12 @@ if __name__ =='__main__':
     train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,50)
     test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,30)
 
-
     sess = tf.Session()
     init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
+
+    # open queue.
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess,coord=coord)
     sess.run(init_op)
 
     # set train dict.
@@ -41,3 +44,8 @@ if __name__ =='__main__':
            loss, accuracy, precision, recall = vgg.validate(test_feature,test_label_onehot)
            print('Step',step)
            print('Loss: %s, Acc: %.2f, Precision: %.2f, Recall: %.2f',loss,accuracy,precision,recall)
+
+    # close queue.
+    coord.request_stop()
+    coord.join(threads)
+    TensorFlow_log.info('CNN training done.')
