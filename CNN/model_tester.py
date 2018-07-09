@@ -12,7 +12,7 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 6
-file_dir = './example3'
+file_dir = './example'
 output_file = 'test.csv'
 label = 0
 if __name__ =='__main__':
@@ -41,6 +41,7 @@ if __name__ =='__main__':
                 labels = []
                 if len(fileNames)==0:
                     continue
+                print(fileNames)
                 for image_name in fileNames:
                     # open image.
                     try:
@@ -69,6 +70,7 @@ if __name__ =='__main__':
                 TensorFlow_log.info('Start predict user %s images ...',name)
                 test_output = sess.run(output, {tf_x: input})
                 prediction = np.argmax(test_output, 1)
+                print(prediction)
                 TensorFlow_log.info('Finish prediction.')
                 # precision ,recall ,f1 score.
                 precision = Precision(prediction,labels,label)
