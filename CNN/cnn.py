@@ -33,7 +33,7 @@ class Vgg16:
 
         TensorFlow_log.info('load train data')
         # load data.
-        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,50)
+        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,80)
         self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
         
         # pre-trained parameters

@@ -12,9 +12,9 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 6
-file_dir = './example3'
+file_dir = './example'
 output_file = 'test.csv'
-label = 0
+label = 3
 if __name__ =='__main__':
     
 
@@ -43,26 +43,29 @@ if __name__ =='__main__':
                     continue
                 for image_name in fileNames:
                     # open image.
-                    try:
-                        image = io.imread(os.path.join(dirPath, image_name))
-                        height, width, depth = image.shape
-                        if image is None:
-                            TensorFlow_log.warning('Error images')
-                        elif height == 640 or width ==640:
-                            image_raw = image.tostring()
-                        else:
-                            TensorFlow_log.warning('Image has wrong size.')
-                        # check the image shape.
-                        image_byte = bytes_feature(image_raw)
-                        image_content = tf.decode_raw([image_raw], tf.uint8)
-                        image = tf.reshape(image_content, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
-                        img = tf.cast(image, tf.float32) * (1. / 255) - 0.5
-                        imgs.append(img)
-                        # labels
-                        labels.append(label)
-                    except:
-                    # image is not in this folder.
-                        TensorFlow_log.error('Input prediction image failed.')
+                    if len(imgs)<50:
+                        try:
+                            image = io.imread(os.path.join(dirPath, image_name))
+                            height, width, depth = image.shape
+                            if image is None:
+                                TensorFlow_log.warning('Error images')
+                            elif height == 640 or width ==640:
+                                image_raw = image.tostring()
+                            else:
+                                TensorFlow_log.warning('Image has wrong size.')
+                            # check the image shape.
+                            image_byte = bytes_feature(image_raw)
+                            image_content = tf.decode_raw([image_raw], tf.uint8)
+                            image = tf.reshape(image_content, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
+                            img = tf.cast(image, tf.float32) * (1. / 255) - 0.5
+                            imgs.append(img)
+                            # labels
+                            labels.append(label)
+                        except:
+                            # image is not in this folder.
+                            TensorFlow_log.error('Input prediction image failed.')
+                    else:
+                        break
                 # initialize input value.
                 input = sess.run(imgs)
                 # start predict.
