@@ -41,6 +41,7 @@ if __name__ =='__main__':
                 labels = []
                 if len(fileNames)==0:
                     continue
+                print(fileNames)
                 for image_name in fileNames:
                     # open image.
                     if len(imgs)<50:
@@ -72,6 +73,7 @@ if __name__ =='__main__':
                 TensorFlow_log.info('Start predict user %s images ...',name)
                 test_output = sess.run(output, {tf_x: input})
                 prediction = np.argmax(test_output, 1)
+                print(prediction)
                 TensorFlow_log.info('Finish prediction.')
                 # precision ,recall ,f1 score.
                 precision = Precision(prediction,labels,label)

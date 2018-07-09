@@ -92,7 +92,7 @@ def TFRecord_Reader(TFRecord_Files,IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,Batch_Si
     TFRecord_log.info('Start read TFRecord file.')
     # create queue.
     try:
-      filename_queue = tf.train.string_input_producer([TFRecord_Files],shuffle=True,num_epochs=None)
+      filename_queue = tf.train.string_input_producer([TFRecord_Files],shuffle=True,num_epochs=1)
     except:
       TFRecord_log.error('Input data in queue faild !!')
     # reader.
