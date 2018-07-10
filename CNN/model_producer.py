@@ -9,7 +9,7 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 6
-LR = 0.0001
+LR = 1e-4
 dropout = 0.4
 
 
@@ -33,10 +33,12 @@ if __name__ =='__main__':
     # def loss, accuracy.
     with tf.name_scope('Loss'):
         loss = tf.losses.softmax_cross_entropy(onehot_labels=tf_y, logits=output)
+        # cross_entropy = tf.reduce_mean(-tf.reduce_sum(tf_y * tf.log((output +1)/2+ 1e-15),
+        #                                           reduction_indices=[1]))
     tf.summary.scalar('loss',loss)
 
     with tf.name_scope('Train'):
-        train_op = tf.train.AdamOptimizer(LR).minimize(loss)
+        train_op = tf.train.GradientDescentOptimizer(LR).minimize(loss)
     tf.summary.scalar('leaning_rate',LR)
 
     with tf.name_scope('Accuracy'):
