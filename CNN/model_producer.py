@@ -30,9 +30,9 @@ if __name__ =='__main__':
 
     # def loss, accuracy.
     with tf.name_scope('Loss'):
-        # loss = tf.losses.softmax_cross_entropy(onehot_labels=tf_y, logits=output)
-        loss = tf.reduce_mean(-tf.reduce_sum(tf_y * tf.log((output +1)/2+ 1e-15),
-                                                  reduction_indices=[1]))
+        loss = tf.losses.softmax_cross_entropy(onehot_labels=tf_y, logits=output)
+        # loss = tf.reduce_mean(-tf.reduce_sum(tf_y * tf.log((output +1)/2+ 1e-15),
+        #                                           reduction_indices=[1]))
     tf.summary.scalar('loss',loss)
 
     with tf.name_scope('Train'):
