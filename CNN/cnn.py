@@ -21,7 +21,8 @@ def CNN_Model(Image, Image_height, Image_width, Conv1_Filter, Conv2_Filter, Conv
 
     flat = tf.reshape(pool4, [-1, int(output_shape)])
     # output layer
-    output = tf.layers.dense(flat, output_layer_units ,name='output')
+    fc5 = tf.layers.dense(flat, 256,tf.nn.relu ,name='fc5')
+    output = tf.layers.dense(fc5, output_layer_units, name='output')
     
     return output
 
