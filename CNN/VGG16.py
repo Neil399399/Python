@@ -13,5 +13,5 @@ IMAGE_DEPTH = 3
 one_hot_depth = 6
 
 if __name__ =='__main__':
-    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.001)
+    vgg = Vgg16(vgg16_npy_path='./utilities/vgg16.npy',output_layer_units=6,LR=0.00001)
     vgg.train(101,6)
