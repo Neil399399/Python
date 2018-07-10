@@ -99,7 +99,9 @@ class Vgg16:
             tf.summary.scalar('loss',self.loss)
             self.train_op = tf.train.AdamOptimizer(LR).minimize(self.loss)
             with tf.name_scope('Accuracy'):
-                self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
+                # self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
+                self.correct_pred = tf.equal(tf.argmax(self.out, 1), tf.argmax(self.tfy, 1))
+                self.accuracy = tf.reduce_mean(tf.cast(self.correct_pred, tf.float32))
             tf.summary.scalar('accuracy',self.accuracy)
             with tf.name_scope('Precision'):
                 self.precision = tf.metrics.precision(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
@@ -134,7 +136,8 @@ class Vgg16:
             
             loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
             summary_tloss, _ = self.sess.run([self.merged, self.loss], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
-            TensorFlow_log.info('Step %d , Loss: %s',step,loss)
+            accuracy = self.sess.run(self.accuracy,{self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+            TensorFlow_log.info('Step %d , Loss: %s ,Acc: %.2f',step,loss,accuracy)
             self.train_writer.add_summary(summary_tloss,step)
 
             if step %10 == 0:
