@@ -34,9 +34,7 @@ class Vgg16:
 
         TensorFlow_log.info('load train data')
         # load data.
-        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,80)
-        self.test_images,self.test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',640,640,3,30)
-        
+        self.train_images,self.train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',640,640,3,100)        
         # pre-trained parameters
         TensorFlow_log.info('Start pretrain')
         try:
@@ -83,7 +81,8 @@ class Vgg16:
         # reconstruct your own fc layers serve for your own purpose
         self.flatten = tf.reshape(pool5, [-1, 7*7*512])
         self.fc6 = tf.layers.dense(self.flatten, 256, tf.nn.relu, name='fc6')
-        self.out = tf.layers.dense(self.fc6, output_layer_units, name='output')
+        self.output = tf.layers.dense(self.fc6, output_layer_units, name='output')
+        self.out = tf.nn.dropout(self.output,0.5)
 
         self.sess = tf.Session()
         # open queue.
@@ -98,7 +97,7 @@ class Vgg16:
             with tf.name_scope('Loss'):
                 self.loss = tf.losses.mean_squared_error(labels=self.tfy, predictions=self.out)
             tf.summary.scalar('loss',self.loss)
-            self.train_op = tf.train.AdamOptimizer(LR).minimize(self.loss)
+            self.train_op = tf.train.GradientDescentOptimizer(LR).minimize(self.loss)
             with tf.name_scope('Accuracy'):
                 self.accuracy = tf.metrics.accuracy(labels=tf.argmax(self.tfy, axis=1), predictions=tf.argmax(self.out, axis=1))[1]
             tf.summary.scalar('accuracy',self.accuracy)
@@ -131,10 +130,7 @@ class Vgg16:
             self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
             # decode train_label to one_hot.
             self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
-            # set test dict.
-            self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
-            # decode test_label to one_hot.
-            self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
+
             
             loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
             summary_tloss, _ = self.sess.run([self.merged, self.loss], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
@@ -155,10 +151,10 @@ class Vgg16:
                 
 
     def validate(self):
-        summary_loss, loss = self.sess.run([self.merged, self.loss], {self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        summary_acc, accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        summary_pre, precision = self.sess.run([self.merged, self.precision],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
-        summary_rec,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.test_feature, self.tfy: self.test_label_onehot})
+        summary_loss, loss = self.sess.run([self.merged, self.loss], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+        summary_acc, accuracy = self.sess.run([self.merged, self.accuracy],{self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+        summary_pre, precision = self.sess.run([self.merged, self.precision],{self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
+        summary_rec,recall = self.sess.run([self.merged, self.recall],{self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
         return loss, accuracy, precision, recall, summary_loss, summary_acc, summary_pre,summary_rec
 
     # def predict(self, paths):
