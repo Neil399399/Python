@@ -1,6 +1,6 @@
-from TFRecord import bytes_feature
+from TFRecord import TFRecord_Reader
 from skimage import io
-from utilities.util import Writer, Precision, Recall, F1_Score
+from utilities.util import Writer, Precision, Recall, F1_Score, Accuracy
 from utilities.log import TensorFlow_log
 import tensorflow as tf
 import numpy as np
@@ -14,9 +14,11 @@ IMAGE_DEPTH = 3
 one_hot_depth = 6
 file_dir = './example'
 output_file = 'test.csv'
-label = 3
+label = 1
+
 if __name__ =='__main__':
     
+    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,80)
 
     # load graph.
     saver = tf.train.import_meta_graph('./Model/CNN.model-200.meta')
@@ -30,57 +32,41 @@ if __name__ =='__main__':
     TensorFlow_log.info('Load images.')
     # get images from folder.
     # Using "os.walk" function to grab all the files in each folder
-    for dirPath_root, dirNames, fileNames in os.walk(file_dir):
-        for name in dirNames:
-            subfolder_path = os.path.join(dirPath_root, name)
-            sess = tf.Session()
-            saver.restore(sess,tf.train.latest_checkpoint('./Model/'))
+    # for dirPath_root, dirNames, fileNames in os.walk(file_dir):
+    #     for name in dirNames:
+    #         subfolder_path = os.path.join(dirPath_root, name)
+    sess = tf.Session()
+    saver.restore(sess,tf.train.latest_checkpoint('./Model/'))
+    init_op = tf.group(tf.global_variables_initializer(), tf.local_variables_initializer())
 
-            for dirPath, dirNames, fileNames in os.walk(subfolder_path):
-                imgs = []
-                labels = []
-                if len(fileNames)==0:
-                    continue
-                print(fileNames)
-                for image_name in fileNames:
-                    # open image.
-                    if len(imgs)<50:
-                        try:
-                            image = io.imread(os.path.join(dirPath, image_name))
-                            height, width, depth = image.shape
-                            if image is None:
-                                TensorFlow_log.warning('Error images')
-                            elif height == 640 or width ==640:
-                                image_raw = image.tostring()
-                            else:
-                                TensorFlow_log.warning('Image has wrong size.')
-                            # check the image shape.
-                            image_byte = bytes_feature(image_raw)
-                            image_content = tf.decode_raw([image_raw], tf.uint8)
-                            image = tf.reshape(image_content, [IMAGE_HEIGHT, IMAGE_WIDTH, IMAGE_DEPTH])
-                            img = tf.cast(image, tf.float32) * (1. / 255) - 0.5
-                            imgs.append(img)
-                            # labels
-                            labels.append(label)
-                        except:
-                            # image is not in this folder.
-                            TensorFlow_log.error('Input prediction image failed.')
-                    else:
-                        break
-                # initialize input value.
-                input = sess.run(imgs)
-                # start predict.
-                TensorFlow_log.info('Start predict user %s images ...',name)
-                test_output = sess.run(output, {tf_x: input})
-                prediction = np.argmax(test_output, 1)
-                print(prediction)
-                TensorFlow_log.info('Finish prediction.')
-                # precision ,recall ,f1 score.
-                precision = Precision(prediction,labels,label)
-                recall = Recall(prediction,labels,label)
-                f1_score = F1_Score(precision,recall)
-                TensorFlow_log.info('Precision: %.2f ,Recall: %.2f , F1: %.2f',precision,recall,f1_score)
-                TensorFlow_log.info('Save in file.')
+    # open queue.
+    coord = tf.train.Coordinator()
+    threads = tf.train.start_queue_runners(sess=sess,coord=coord)
+    sess.run(init_op)
+
+    # start predict.
+    temp_predict = []
+    temp_label = []
+    for step in range(5):
+        # set test dict.
+        test_feature, test_label = sess.run([test_images,test_labels])
+        test_output = sess.run(output, {tf_x: test_feature})
+        prediction = np.argmax(test_output, 1)
+        TensorFlow_log.info('Finish prediction.')
+        for value in prediction:
+            temp_predict.append(value)
+        for label in test_label:
+            temp_label.append(int(label))
+    # precision ,recall ,f1 score.
+    precision = Precision(temp_predict,temp_label,label)
+    recall = Recall(prediction,test_label,label)
+    f1_score = F1_Score(precision,recall)
+    accuracy = Accuracy(prediction,test_label)
+    TensorFlow_log.info('Precision: %.2f ,Recall: %.2f , F1: %.2f ,Acc: %.2f',precision,recall,f1_score,accuracy)
+
+    coord.request_stop()
+    coord.join(threads)
+    TensorFlow_log.info('Save in file.')
     TensorFlow_log.info('Finish all user predict and save.')
 
             

@@ -9,14 +9,14 @@ IMAGE_HEIGHT = 640
 IMAGE_WIDTH = 640
 IMAGE_DEPTH = 3
 one_hot_depth = 6
-LR = 0.001
-dropout = 0.5
+LR = 0.0001
+dropout = 0.4
 
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,80)
-    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,40)
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,60)
+    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,50)
 
 
     # setting placeholder.
@@ -27,7 +27,7 @@ if __name__ =='__main__':
         keep_prob = tf.placeholder(tf.float32,name='dropout')
 
     # CNN.
-    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,6,36,216,2,'same',tf.nn.relu,one_hot_depth)
+    result = CNN_Model(image,IMAGE_HEIGHT,IMAGE_WIDTH,3,26,72,128,2,'same',tf.nn.relu,one_hot_depth)
     output = tf.nn.dropout(result,keep_prob)
 
     # def loss, accuracy.
@@ -60,16 +60,6 @@ if __name__ =='__main__':
     threads = tf.train.start_queue_runners(sess=sess,coord=coord)
     sess.run(init_op)
 
-    # set train dict.
-    train_feature, train_label = sess.run([train_images,train_labels])
-    # decode train_label to one_hot.
-    train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
-
-    # set test dict.
-    test_feature, test_label = sess.run([test_images,test_labels])
-    # decode test_label to one_hot.
-    test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
-
     # saver.
     saver = tf.train.Saver(max_to_keep=1)
     # tensorboard.
@@ -79,9 +69,19 @@ if __name__ =='__main__':
 
 
     # training.
-    TensorFlow_log.info('Make graph and start trainng.')
-    for step in range(201):
+    TensorFlow_log.info('Make graph and start training.')
+    for step in range(101):
         TensorFlow_log.info('Training step :%d',step)
+        # set train dict.
+        train_feature, train_label = sess.run([train_images,train_labels])
+        # decode train_label to one_hot.
+        train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
+
+        # set test dict.
+        test_feature, test_label = sess.run([test_images,test_labels])
+        # decode test_label to one_hot.
+        test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
+
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
         summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
 
@@ -94,13 +94,9 @@ if __name__ =='__main__':
 
     # final validate with used test data.
     TensorFlow_log.info('Start Testing(100).')
-    temp_accuracy = 0
-    temp_precision = 0
-    temp_recall = 0
-
-    test_output = sess.run(output, {tf_x: test_feature,keep_prob:dropout})
+    test_output = sess.run(output, {tf_x: train_feature,keep_prob:dropout})
     predictions = np.argmax(test_output, 1)
-    labels = np.argmax(test_label_onehot, 1)
+    labels = np.argmax(train_label_onehot, 1)
     test_summary_acc,test_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
     test_precision = sess.run(precision,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
     test_recall = sess.run(recall,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
@@ -112,4 +108,4 @@ if __name__ =='__main__':
     TensorFlow_log.info('CNN training done.')
 
     # save model.
-    saver.save(sess,'./Model/CNN.model',global_step=step)
+    saver.save(sess,'./Model/CNN(6).model',global_step=step)

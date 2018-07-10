@@ -1,5 +1,12 @@
 import csv
 
+def Accuracy(predictions,labels):
+    count = 0
+    for index in range(len(predictions)):
+        if predictions[index]==labels[index]:
+            count +=1
+    return count/len(predictions)
+
 def Precision(predictions,labels,label):
     TP = 0
     FP = 0
