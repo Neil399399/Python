@@ -90,14 +90,6 @@ class Vgg16:
         self.coord = tf.train.Coordinator()
         self.threads = tf.train.start_queue_runners(sess=self.sess,coord=self.coord)
 
-        # set train dict.
-        self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
-        # decode train_label to one_hot.
-        self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
-        # set test dict.
-        self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
-        # decode test_label to one_hot.
-        self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
 
         if restore_from:
             saver = tf.train.Saver()
@@ -133,8 +125,17 @@ class Vgg16:
             lout = tf.nn.relu(tf.nn.bias_add(conv, self.data_dict[name][1]))
             return lout
 
-    def train(self,learning_step):
+    def train(self,learning_step,output_layer_units):
         for step in range(learning_step): 
+            # set train dict.
+            self.train_feature, self.train_label = self.sess.run([self.train_images,self.train_labels])
+            # decode train_label to one_hot.
+            self.train_label_onehot = self.sess.run(tf.one_hot(self.train_label,output_layer_units))
+            # set test dict.
+            self.test_feature, self.test_label = self.sess.run([self.test_images,self.test_labels])
+            # decode test_label to one_hot.
+            self.test_label_onehot = self.sess.run(tf.one_hot(self.test_label,output_layer_units))
+            
             loss, _ = self.sess.run([self.loss, self.train_op], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
             summary_tloss, _ = self.sess.run([self.merged, self.loss], {self.tfx: self.train_feature, self.tfy: self.train_label_onehot})
             TensorFlow_log.info('Step %d , Loss: %s',step,loss)
