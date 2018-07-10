@@ -70,7 +70,7 @@ if __name__ =='__main__':
 
     # training.
     TensorFlow_log.info('Make graph and start training.')
-    for step in range(101):
+    for step in range(201):
         TensorFlow_log.info('Training step :%d',step)
         # set train dict.
         train_feature, train_label = sess.run([train_images,train_labels])
