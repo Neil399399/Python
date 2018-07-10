@@ -15,9 +15,7 @@ dropout = 0.4
 
 if __name__ =='__main__':
     # train data.
-    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,60)
-    test_images,test_labels = TFRecord_Reader('./TFRecord/test.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,50)
-
+    train_images,train_labels = TFRecord_Reader('./TFRecord/train.tfrecord',IMAGE_HEIGHT,IMAGE_WIDTH,IMAGE_DEPTH,100)
 
     # setting placeholder.
     with tf.name_scope('Input'):
@@ -79,16 +77,11 @@ if __name__ =='__main__':
         # decode train_label to one_hot.
         train_label_onehot = sess.run(tf.one_hot(train_label,one_hot_depth))
 
-        # set test dict.
-        test_feature, test_label = sess.run([test_images,test_labels])
-        # decode test_label to one_hot.
-        test_label_onehot = sess.run(tf.one_hot(test_label,one_hot_depth))
-
         _, loss_ = sess.run([train_op, loss], {tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
         summary_loss,_ = sess.run([merged,loss],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
 
         if step % 10 == 0:
-            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
+            summary_acc,validate_accuracy = sess.run([merged,accuracy],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
             TensorFlow_log.info('After %d training step(s), the validation accuracy is %.2f.',step,validate_accuracy)
             TensorFlow_log.info('loss : %s',loss_)
             train_writer.add_summary(summary_acc,step)
@@ -99,9 +92,9 @@ if __name__ =='__main__':
     test_output = sess.run(output, {tf_x: train_feature,keep_prob:dropout})
     predictions = np.argmax(test_output, 1)
     labels = np.argmax(train_label_onehot, 1)
-    test_summary_acc,test_accuracy = sess.run([merged,accuracy],{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
-    test_precision = sess.run(precision,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
-    test_recall = sess.run(recall,{tf_x: test_feature, tf_y: test_label_onehot,keep_prob:dropout})
+    test_summary_acc,test_accuracy = sess.run([merged,accuracy],{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
+    test_precision = sess.run(precision,{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
+    test_recall = sess.run(recall,{tf_x: train_feature, tf_y: train_label_onehot,keep_prob:dropout})
     test_writer.add_summary(test_summary_acc,step)
     print(test_precision,test_recall)
     # close queue.
