@@ -26,7 +26,7 @@ if __name__ =='__main__':
     test_image_list,test_label_list, folders = get_File(test_Dir,'test')
 
     # make train tfrecord.
-    TFRecord_Writer(train_image_list,train_label_list,'./','train',tfrecord_dir,'train.tfrecord')
+    TFRecord_Writer(train_image_list,train_label_list,'./','train',tfrecord_dir,'train2.tfrecord')
     shutil.rmtree('./train', ignore_errors=True)
     TFRecord_log.info('Remove train folder.')
     # make test tfrecord.
